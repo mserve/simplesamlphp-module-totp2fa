@@ -29,17 +29,28 @@ try {
         new \SimpleSAML\Error\Exception('No login request found.'));
 }
 
-// Check the token
-if (!empty($_REQUEST['token']) {
-    // Validate the token   
-}
-
 // Load template
 $cfg = \SimpleSAML\Configuration::getInstance();
 $template = new \SimpleSAML\XHTML\Template($cfg, 'totp2fa:/otpform.twig');
 
-$template->data['stateparams'] = ['AuthState' => $authStateId];
+$template->data['stateparams'] = ['AuthState' => $authStateId, 'RequestSent' => true];
 $template->data['links'] = ''; //$source->getLoginLinks();
+
+// Assume no error
+$template->data['errorcode'] = null;
+
+// Check the token
+if (!empty($_REQUEST['otp'])) {
+    // Validate the token   
+    //TESTING:
+    $template->data['errorcode'] = 1;
+    $template->data['errtitle'] = "Your Token:";
+    $template->data['errdesc'] = $_REQUEST['otp'];
+} else if (empty($_REQUEST['otp']) && !empty($_REQUEST['RequestSent'])) {
+    $template->data['errorcode'] = 1;
+    $template->data['errtitle'] = "No Token entered";
+    $template->data['errdesc'] = "Please enter your One Time Password to proceed.";
+}
 
 
 // get the name of the SP

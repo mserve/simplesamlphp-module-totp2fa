@@ -2,6 +2,18 @@
 {% extends "@core/loginuserpass.twig" %}
 
 {% block content %}
+
+    {% if errorcode -%}
+    <div class="pure-g">
+        <div class="pure-u-1">
+            <div class="message-box error">
+                <h3>{{ errtitle|trans }}</h3>
+                <p>{{ errdesc|trans }}</p>
+            </div>
+        </div>
+    </div>
+    {%- endif %}
+
 <h1>{{ 'Enter your One Time Password'|trans }}</h1>
 
 <p>{{ 'A service has requested you to authenticate yourself. Please enter your One Time Password to proceed.'|trans }}</p>
