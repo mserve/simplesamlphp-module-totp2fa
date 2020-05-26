@@ -1,0 +1,22 @@
+{
+    "name": "oszimt/simplesamlphp-module-totp2fa",
+    "description": "TOTP 2FA module using an attribute with totp:// url",
+    "type": "simplesamlphp-module",
+    "license": "LGPL-2.1-or-later",
+    "authors": [
+        {
+            "name": "Martin Schleyer",
+            "email": "schleyer@oszimt.de"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "SimpleSAML\\Module\\totp2fa\\": "lib"
+        }
+    },
+    "require": {
+        "php": ">=7.2",
+        "simplesamlphp/composer-module-installer": "~1.0",
+        "spomky-labs/otphp": "^10.0"
+    }
+}
