@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file will show an OTP form to ask the user for the current OTP token value
  *
@@ -14,8 +13,6 @@ if (!array_key_exists('AuthState', $_REQUEST)) {
 }
 
 $authStateId = $_REQUEST['AuthState'];
-
-
 
 try {
     // try to get the state
@@ -40,16 +37,27 @@ $template->data['links'] = ''; //$source->getLoginLinks();
 $template->data['errorcode'] = null;
 
 // Check the token
-if (!empty($_REQUEST['otp'])) {
+$token = preg_replace("/\s+/", "", $_REQUEST['otp']);
+if (!empty($token)) {
     // Validate the token   
-    //TESTING:
-    $template->data['errorcode'] = 1;
-    $template->data['errtitle'] = "Your Token:";
-    $template->data['errdesc'] = $_REQUEST['otp'];
-} else if (empty($_REQUEST['otp']) && !empty($_REQUEST['RequestSent'])) {
+    $otp = new \SimpleSAML\Module\totp2fa\OtpHandler(['window' => 180]);
+    $isOtpValid = $otp->validateToken($state['totp2fa:urn'] , $token);
+    $expectedToken = $otp->getExpectedToken($state['totp2fa:urn']);
+    if ($isOtpValid) {
+        \SimpleSAML\Auth\State::saveState($state, 'totp2fa:totp2fa:init');
+        \SimpleSAML\Logger::debug("totp2fa: Saved state totp2fa:totp2fa:init from otpform.php");
+        \SimpleSAML\Auth\ProcessingChain::resumeProcessing($state);
+    } else {
+        \SimpleSAML\Logger::debug("totp2fa: User entered wrong OTP");
+        $template->data['errorcode'] = 400;
+        $template->data['errtitle'] = "Invalid Token:";
+        $template->data['errdesc'] = "The token you entered is invalid. Please check your token. If you use a software token, your local time might be to far off!";
+    }                
+} else if (empty($token) && !empty($_REQUEST['RequestSent'])) {
     $template->data['errorcode'] = 1;
     $template->data['errtitle'] = "No Token entered";
     $template->data['errdesc'] = "Please enter your One Time Password to proceed.";
+    \SimpleSAML\Logger::debug("totp2fa: User did not enter an OTP");
 }
 
 

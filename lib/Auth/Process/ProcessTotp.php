@@ -4,9 +4,8 @@ namespace SimpleSAML\Module\totp2fa\Auth\Process;
 
 use SimpleSAML\Logger;
 use Webmozart\Assert\Assert;
+use SimpleSAML\Module\totp2fa\OtpHandler;
 
-// OTP
-use OTPHP\Factory;
 
 class ProcessTotp extends \SimpleSAML\Auth\ProcessingFilter {
 
@@ -73,7 +72,7 @@ class ProcessTotp extends \SimpleSAML\Auth\ProcessingFilter {
             return;
         }
         // Check if properly provisioned
-        if (!$this->isProvisioningUriValid($request['totp2fa:urn'])){
+        if (!OtpHandler::isProvisioningUriValid($request['totp2fa:urn'])){
             // not provisioned is ok in 'optional' mode, fail otherwise
             Logger::info("TOTP2FA Auth Proc Filter: URI not valid");
             if ($this->mode !== 'optional') {
@@ -96,13 +95,4 @@ class ProcessTotp extends \SimpleSAML\Auth\ProcessingFilter {
         \SimpleSAML\Utils\HTTP::redirectTrustedURL($url, array('AuthState' => $id));
     }
 
-    private function isProvisioningUriValid(string $uri): bool
-    {
-        try {
-            $otp = Factory::loadFromProvisioningUri($uri);
-        } catch (\Exception $e) {
-            return false;            
-        }
-        return true;
-    }
 }
