@@ -51,7 +51,7 @@ if (!empty($token)) {
         \SimpleSAML\Logger::debug("totp2fa: User entered wrong OTP");
         $template->data['errorcode'] = 400;
         $template->data['errtitle'] = "Invalid Token:";
-        $template->data['errdesc'] = "The token you entered is invalid. Please check your token. If you use a software token, your local time might be to far off!";
+        $template->data['errdesc'] = "<pre>" . print_r($state['SPMetadata'], true) . "</pre>"; //"The token you entered is invalid. Please check your token. If you use a software token, your local time might be to far off!";
     }                
 } else if (empty($token) && !empty($_REQUEST['RequestSent'])) {
     $template->data['errorcode'] = 1;

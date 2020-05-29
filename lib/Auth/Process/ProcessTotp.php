@@ -15,6 +15,7 @@ class ProcessTotp extends \SimpleSAML\Auth\ProcessingFilter {
      */
     private $attributeName = 'hotpToken';
 
+    const ALLOWED_MODES = ['required', 'optional', 'never'];
 
     /**
      * mode - can be 'required', 'optional', 'never'
@@ -42,11 +43,12 @@ class ProcessTotp extends \SimpleSAML\Auth\ProcessingFilter {
         }
 
         // Set config value for mode
-		if (! empty($config["mode"])){
+        if (!empty($config["mode"])) {
             // TODO: check if value is in array('required', 'optional', 'never')
-			$this->mode = $config["mode"];
-		}
-                
+            if (array_key_exists($config["mode"], self::ALLOWED_MODES)) {
+                $this->mode = $config["mode"];
+            }
+        }                
     }
 
     /**
@@ -58,33 +60,46 @@ class ProcessTotp extends \SimpleSAML\Auth\ProcessingFilter {
     {
         // Assert::keyExists($request, 'Attributes');        
         Logger::info("TOTP2FA Auth Proc Filter: Entering process function");
-        Logger::info("TOTP2FA Auth Proc Filter: State Array: " . print_r($request, true));
+        // Logger::info("TOTP2FA Auth Proc Filter: State Array: " . print_r($request, true));
 
         $request['totp2fa:urn'] = $request['Attributes'][$this->attributeName][0];
         
-        // Hide attribute
-        $request['Attributes'][$this->attributeName] = array();
+        // Remove attribute
+        unset($request['Attributes'][$this->attributeName]);
 
-        // State 0: check, if 2FA is required
-        if ($this->mode === 'never') {
-            // 2FA not required
+        // Check, if 2FA is required
+        $mode = $this->mode;
+        if (!empty($request['totp2fa:mode'])) {
+            if (array_key_exists($request['totp2fa:mode'], self::ALLOWED_MODES)) {
+                $mode = $request['totp2fa:mode'];
+            }
+        }
+        if ($mode === 'never') {
+            // 2FA disabled globally required
             Logger::info("TOTP2FA Auth Proc Filter: 2FA not enable");
             return;
         }
+
         // Check if properly provisioned
         if (!OtpHandler::isProvisioningUriValid($request['totp2fa:urn'])){
             // not provisioned is ok in 'optional' mode, fail otherwise
             Logger::info("TOTP2FA Auth Proc Filter: URI not valid");
-            if ($this->mode !== 'optional') {
+            if ($mode !== 'optional') {
                 return;
             }
         } else {
             // Properly provisioned
         }
 
+        
+        //  check if 2FA is still valid
+        //         $session = Session::getSessionFromRequest();
+
+        // Check if 2FA is valid
+
+        // else show token
         $this->openOtpForm($request);
 
-        // State 2: check if 2FA is still valid
 
     }
 
