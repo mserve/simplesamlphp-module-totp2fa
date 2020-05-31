@@ -1,5 +1,5 @@
 {% set pagetitle = 'SimpleSAMLphp'|trans %}
-{% extends "@core/loginuserpass.twig" %}
+{% extends "@core/base.twig" %}
 
 {% block content %}
 

@@ -1,13 +1,12 @@
 <?php
 
-namespace SimpleSAML\Module\totp2fa\Auth\Process;
+//namespace SimpleSAML\Module\totp2fa\Auth\Process;
 
-use SimpleSAML\Logger;
-use Webmozart\Assert\Assert;
-use SimpleSAML\Module\totp2fa\OtpHandler;
+//use SimpleSAML\Logger;
+//use Webmozart\Assert\Assert;
+//use SimpleSAML\Module\totp2fa\OtpHandler;
 
-
-class ProcessTotp extends \SimpleSAML\Auth\ProcessingFilter {
+class sspmod_totp2fa_Auth_Process_ProcessTotp extends SimpleSAML_Auth_ProcessingFilter {
 
     /**
      * the attribute name
@@ -15,7 +14,7 @@ class ProcessTotp extends \SimpleSAML\Auth\ProcessingFilter {
      */
     private $attributeName = 'hotpToken';
 
-    const ALLOWED_MODES = ['required', 'optional', 'never'];
+    const ALLOWED_MODES = array('required', 'optional', 'never');
 
     /**
      * mode - can be 'required', 'optional', 'never'
@@ -38,7 +37,7 @@ class ProcessTotp extends \SimpleSAML\Auth\ProcessingFilter {
         parent::__construct($config, $reserved);
         
         // Set config value for attributeName
-		if (! empty($config["attributeName"])){
+		if (!empty($config["attributeName"])){
 			$this->attributeName = $config["attributeName"];
         }
 
@@ -56,11 +55,11 @@ class ProcessTotp extends \SimpleSAML\Auth\ProcessingFilter {
      * @param array &$request The current request
      * @return void
      */
-    public function process(array &$request): void
+    public function process(&$request)
     {
         // Assert::keyExists($request, 'Attributes');        
-        Logger::info("TOTP2FA Auth Proc Filter: Entering process function");
-        // Logger::info("TOTP2FA Auth Proc Filter: State Array: " . print_r($request, true));
+        SimpleSAML\Logger::info("TOTP2FA Auth Proc Filter: Entering process function");
+        // SimpleSAML\Logger::info("TOTP2FA Auth Proc Filter: State Array: " . print_r($request, true));
 
         $request['totp2fa:urn'] = $request['Attributes'][$this->attributeName][0];
         
@@ -76,14 +75,14 @@ class ProcessTotp extends \SimpleSAML\Auth\ProcessingFilter {
         }
         if ($mode === 'never') {
             // 2FA disabled globally required
-            Logger::info("TOTP2FA Auth Proc Filter: 2FA not enable");
+            SimpleSAML\Logger::info("TOTP2FA Auth Proc Filter: 2FA not enable");
             return;
         }
 
         // Check if properly provisioned
-        if (!OtpHandler::isProvisioningUriValid($request['totp2fa:urn'])){
+        if (!sspmod_totp2fa_OtpHandler::isProvisioningUriValid($request['totp2fa:urn'])){
             // not provisioned is ok in 'optional' mode, fail otherwise
-            Logger::info("TOTP2FA Auth Proc Filter: URI not valid");
+            SimpleSAML\Logger::info("TOTP2FA Auth Proc Filter: URI not valid");
             if ($mode !== 'optional') {
                 return;
             }
@@ -105,9 +104,9 @@ class ProcessTotp extends \SimpleSAML\Auth\ProcessingFilter {
 
     private function openOtpForm(array &$request): void {
         assert(is_array($request));
-        $id = \SimpleSAML\Auth\State::saveState($request, 'totp2fa:totp2fa:init');
-        $url = \SimpleSAML\Module::getModuleURL('totp2fa/otpform.php');
-        \SimpleSAML\Utils\HTTP::redirectTrustedURL($url, array('AuthState' => $id));
+        $id = SimpleSAML_Auth_State::saveState($request, 'totp2fa:totp2fa:init');
+        $url = SimpleSAML_Module::getModuleURL('totp2fa/otpform.php');
+        SimpleSAML_Utilities::redirectTrustedURL($url, array('AuthState' => $id));
     }
 
 }

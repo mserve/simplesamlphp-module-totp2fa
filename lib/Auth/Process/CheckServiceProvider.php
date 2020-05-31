@@ -1,12 +1,10 @@
 <?php
-namespace SimpleSAML\Module\totp2fa\Auth\Process;
+//namespace SimpleSAML\Module\totp2fa\Auth\Process;
 
-use SimpleSAML\Logger;
-use Webmozart\Assert\Assert;
-use SimpleSAML\Module\totp2fa\OtpHandler;
+//use SimpleSAML\Logger;
+//use Webmozart\Assert\Assert;
 
-
-class ProcessTotp extends \SimpleSAML\Auth\CheckServiceProvider {
+class sspmod_totp2fa_Auth_Process_CheckServiceProvider extends SimpleSAML_Auth_ProcessingFilter {
 
 
 
@@ -39,10 +37,10 @@ class ProcessTotp extends \SimpleSAML\Auth\CheckServiceProvider {
      * @param array &$request The current request
      * @return void
      */
-    public function process(array &$request): void
+    public function process(&$request)
     {
         // Assert::keyExists($request, 'Attributes');
-        Logger::info("TOTP2FA CheckServiceProvider Filter: Entering process function");
+        SimpleSAML\Logger::info("TOTP2FA CheckServiceProvider Filter: Entering process function");
     }
 
 }

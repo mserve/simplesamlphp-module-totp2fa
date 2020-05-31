@@ -1,13 +1,14 @@
 <?php
-namespace SimpleSAML\Module\totp2fa;
+/*namespace SimpleSAML\Module\totp2fa;
 
 use SimpleSAML\Logger;
 use Webmozart\Assert\Assert;
 
 // OTP
-use OTPHP\Factory;
 
-class OtpHandler
+use OTPHP\Factory;
+*/
+class sspmod_totp2fa_OtpHandler
 {
 
     // Attributes
@@ -16,15 +17,15 @@ class OtpHandler
 
     // Constructor
     public function __construct($config) {
-        Assert::isArray($config);
-        Assert::keyExists($config, 'window');
+        //Assert::isArray($config);
+        //Assert::keyExists($config, 'window');
         $this->config = $config;
     }
 
     // Validate token
     public function validateToken(string $uri, string $token): bool {
         try {
-            $otp = Factory::loadFromProvisioningUri($uri);
+            $otp = OTPHP\Factory::loadFromProvisioningUri($uri);
         } catch (\Exception $e) {
             // URI not valid
             return false;
@@ -42,7 +43,7 @@ class OtpHandler
 
     public function getExpectedToken($uri): string {
         try {
-            $otp = Factory::loadFromProvisioningUri($uri);
+            $otp = OTPHP\Factory::loadFromProvisioningUri($uri);
         } catch (\Exception $e) {
             // URI not valid
             return null;
@@ -57,7 +58,7 @@ class OtpHandler
         public static function isProvisioningUriValid(string $uri): bool
         {
             try {
-                $otp = Factory::loadFromProvisioningUri($uri);
+                $otp = OTPHP\Factory::loadFromProvisioningUri($uri);
             } catch (\Exception $e) {
                 return false;
             }

@@ -9,7 +9,7 @@
 
 // retrieve the authentication state
 if (!array_key_exists('AuthState', $_REQUEST)) {
-    throw new \SimpleSAML\Error\BadRequest('Missing mandatory parameter: AuthState');
+    throw new SimpleSAML_Error_BadRequest('Missing mandatory parameter: AuthState');
 }
 
 $authStateId = $_REQUEST['AuthState'];
@@ -17,18 +17,18 @@ $authStateId = $_REQUEST['AuthState'];
 try {
     // try to get the state
     /** @var array $state  State can never be null without a third argument */
-    $state = \SimpleSAML\Auth\State::loadState($_REQUEST['AuthState'], 'totp2fa:totp2fa:init');
+    $state = SimpleSAML_Auth_State::loadState($_REQUEST['AuthState'], 'totp2fa:totp2fa:init');
     // $source = \SimpleSAML\Auth\Source::getById($state[\SimpleSAML\Module\core\Auth\UserPassBase::AUTHID]);
 } catch (\Exception $e) {
     // TODO: find proper redirect for error
-    \SimpleSAML\Auth\State::throwException(
+    SimpleSAML_Auth_State::throwException(
         $state,
         new \SimpleSAML\Error\Exception('No login request found.'));
 }
 
 // Load template
-$cfg = \SimpleSAML\Configuration::getInstance();
-$template = new \SimpleSAML\XHTML\Template($cfg, 'totp2fa:/otpform.twig');
+$cfg = SimpleSAML_Configuration::getInstance();
+$template = new SimpleSAML_XHTML_Template($cfg, 'totp2fa:otpform.php');
 
 $template->data['stateparams'] = ['AuthState' => $authStateId, 'RequestSent' => true];
 $template->data['links'] = ''; //$source->getLoginLinks();
@@ -40,13 +40,13 @@ $template->data['errorcode'] = null;
 $token = preg_replace("/\s+/", "", $_REQUEST['otp']);
 if (!empty($token)) {
     // Validate the token   
-    $otp = new \SimpleSAML\Module\totp2fa\OtpHandler(['window' => 180]);
+    $otp = new sspmod_totp2fa_OtpHandler(['window' => 180]);
     $isOtpValid = $otp->validateToken($state['totp2fa:urn'] , $token);
     $expectedToken = $otp->getExpectedToken($state['totp2fa:urn']);
     if ($isOtpValid) {
-        \SimpleSAML\Auth\State::saveState($state, 'totp2fa:totp2fa:init');
+        SimpleSAML_Auth_State::saveState($state, 'totp2fa:totp2fa:init');
         \SimpleSAML\Logger::debug("totp2fa: Saved state totp2fa:totp2fa:init from otpform.php");
-        \SimpleSAML\Auth\ProcessingChain::resumeProcessing($state);
+        SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
     } else {
         \SimpleSAML\Logger::debug("totp2fa: User entered wrong OTP");
         $template->data['errorcode'] = 400;
@@ -73,4 +73,4 @@ if (array_key_exists('name', $spmd)) {
 
 
 
-$template->send();
+$template->show();

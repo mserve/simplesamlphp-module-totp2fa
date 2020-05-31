@@ -1,0 +1,26 @@
+{
+    "otp_header": {
+        "en": "Enter your One Time Password"
+    },
+    "error_header": {
+        "en": "An error occured!"
+    },
+    "otp_text": {
+        "en": "A service has requested you to authenticate yourself. Please enter your One Time Password to proceed."
+    },
+    "otp": {
+        "en": "Token"
+    },    
+    "processing": {
+        "en": "Processing..."
+    },
+    "continue_button": {
+        "en": "Continue"
+    },
+    "help_header": {
+        "en": "Help! I don't have my token available"        
+    },
+    "help_text": {
+        "en": "Without your token you cannot authenticate yourself for access to the service. There may be someone that can help you. Consult the help desk at your organization!"
+    }
+}
