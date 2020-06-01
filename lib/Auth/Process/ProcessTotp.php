@@ -92,8 +92,9 @@ class sspmod_totp2fa_Auth_Process_ProcessTotp extends SimpleSAML_Auth_Processing
 
         
         //  check if 2FA is still valid
-        //         $session = Session::getSessionFromRequest();
-
+        $session = SimpleSAML_Session::getSessionFromRequest();
+        //$expiresAt = $session->getData('int', 'totp2fa:expiresAt');
+        
         // Check if 2FA is valid
 
         // else show token

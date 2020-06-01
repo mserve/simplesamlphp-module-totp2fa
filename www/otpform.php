@@ -40,7 +40,7 @@ $template->data['errorcode'] = null;
 $token = preg_replace("/\s+/", "", $_REQUEST['otp']);
 if (!empty($token)) {
     // Validate the token   
-    $otp = new sspmod_totp2fa_OtpHandler(['window' => 180]);
+    $otp = new sspmod_totp2fa_OtpHandler(array('window' => 180));
     $isOtpValid = $otp->validateToken($state['totp2fa:urn'] , $token);
     $expectedToken = $otp->getExpectedToken($state['totp2fa:urn']);
     if ($isOtpValid) {

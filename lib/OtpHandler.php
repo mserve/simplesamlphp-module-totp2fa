@@ -5,9 +5,9 @@ use SimpleSAML\Logger;
 use Webmozart\Assert\Assert;
 
 // OTP
-
-use OTPHP\Factory;
 */
+use OTPHP\Factory;
+
 class sspmod_totp2fa_OtpHandler
 {
 
@@ -34,9 +34,9 @@ class sspmod_totp2fa_OtpHandler
         // Calculate window
         $window = null;
         if ($this->config['window'] > 0) {
-            $window = ceil($this->config['window'] / $otp->getPeriod());
+            $window = intval(ceil($this->config['window'] / $otp->getPeriod()));
         }
-
+        
         return $otp->verify($token, null, $window);        
     }
 
