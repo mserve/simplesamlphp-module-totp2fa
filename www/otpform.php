@@ -45,6 +45,9 @@ if (!empty($token)) {
     $expectedToken = $otp->getExpectedToken($state['totp2fa:urn']);
     if ($isOtpValid) {
         SimpleSAML_Auth_State::saveState($state, 'totp2fa:totp2fa:init');
+        $session = SimpleSAML_Session::getSessionFromRequest();
+        $session->setData('int', 'totp2fa:lastValidatedAt', time());
+
         \SimpleSAML\Logger::debug("totp2fa: Saved state totp2fa:totp2fa:init from otpform.php");
         SimpleSAML_Auth_ProcessingChain::resumeProcessing($state);
     } else {
