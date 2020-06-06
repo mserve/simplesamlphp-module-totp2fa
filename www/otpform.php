@@ -23,7 +23,7 @@ try {
     // TODO: find proper redirect for error
     SimpleSAML_Auth_State::throwException(
         $state,
-        new \SimpleSAML\Error\Exception('No login request found.'));
+        new SimpleSAML_Error_Exception('No login request found.'));
 }
 
 // Load template
@@ -38,11 +38,24 @@ $template->data['errorcode'] = null;
 
 // Check the token
 $token = preg_replace("/\s+/", "", $_REQUEST['otp']);
+$isOtpValid = false;
 if (!empty($token)) {
-    // Validate the token   
-    $otp = new sspmod_totp2fa_OtpHandler(array('window' => 180));
-    $isOtpValid = $otp->validateToken($state['totp2fa:urn'] , $token);
-    $expectedToken = $otp->getExpectedToken($state['totp2fa:urn']);
+    // Validate the token, using a default window of 30 seconds (why?)
+    if ($state['totp2fa:handler'] == 'ProcessTotp') {
+        $otp = new sspmod_totp2fa_OtpHandler(array('window' => $state['totp2fa:window']));
+        $isOtpValid = $otp->validateToken($state['totp2fa:urn'], $token);
+        $expectedToken = $otp->getExpectedToken($state['totp2fa:urn']);
+    } else if ($state['totp2fa:handler'] == 'ProcessOtpViaApi')  {
+        // Do the API magic
+        $otp = new sspmod_totp2fa_OtpApiHandler($state['totp2fa:apiconfig']);
+        $isOtpValid = $otp->validateToken($token);
+    } else {
+        // Now valid handler - throw error
+        SimpleSAML_Auth_State::throwException(
+            $state,
+            new SimpleSAML_Error_Exception('Invalid OTP handler!'));    
+    }
+
     if ($isOtpValid) {
         SimpleSAML_Auth_State::saveState($state, 'totp2fa:totp2fa:init');
         $session = SimpleSAML_Session::getSessionFromRequest();
@@ -54,7 +67,7 @@ if (!empty($token)) {
         \SimpleSAML\Logger::debug("totp2fa: User entered wrong OTP");
         $template->data['errorcode'] = 400;
         $template->data['errtitle'] = "Invalid Token:";
-        $template->data['errdesc'] = "<pre>" . print_r($state['SPMetadata'], true) . "</pre>"; //"The token you entered is invalid. Please check your token. If you use a software token, your local time might be to far off!";
+        $template->data['errdesc'] = "The token you entered is invalid. Please check your token. If you use a software token, your local time might be to far off!";
     }                
 } else if (empty($token) && !empty($_REQUEST['RequestSent'])) {
     $template->data['errorcode'] = 1;

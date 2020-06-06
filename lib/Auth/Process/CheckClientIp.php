@@ -4,6 +4,8 @@
 //use SimpleSAML\Logger;
 //use Webmozart\Assert\Assert;
 
+use Wikimedia\IPSet;
+
 class sspmod_totp2fa_Auth_Process_CheckClientIp extends SimpleSAML_Auth_ProcessingFilter {
 
 
@@ -41,6 +43,31 @@ class sspmod_totp2fa_Auth_Process_CheckClientIp extends SimpleSAML_Auth_Processi
     {
         // Assert::keyExists($request, 'Attributes');
         SimpleSAML\Logger::info("TOTP2FA CheckClientIp Filter: Entering process function");
+        
+        // Check config
+        if (!array_key_exists('ipNetworks', $this->config)) {
+            // No networks set
+            SimpleSAML\Logger::info("TOTP2FA CheckClientIp Filter: No 'ipNetworks' setting found");
+            return;
+        }
+        
+        // Prepare settings
+        $settings = sspmod_totp2fa_OtpHelper::initializeSettingsArray();        
+
+        // Get ip
+        $ip = @$_SERVER['HTTP_X_FORWARDED_FOR'] ?: @$_SERVER['REMOTE_ADDR'] ?: @$_SERVER['HTTP_CLIENT_IP'];
+
+        // Check IPsets
+        foreach ($this->config['ipNetworks'] as $network => $netconfig) {
+            $ipset = new IPSet(array($network));
+            if ($ipset->match($ip) && sspmod_totp2fa_OtpHelper::hasValidSettings($netconfig)) {
+                SimpleSAML\Logger::info("TOTP2FA CheckClientIp Filter: IP ' . $ip . ' matches network " . $network);
+                $settings = sspmod_totp2fa_OtpHelper::updateSettings($netconfig, $settings);
+            }
+        }        
+
+        // Update settings
+        sspmod_totp2fa_OtpHelper::updateRequestWithSettings($request, $settings);
     }
 
 }
