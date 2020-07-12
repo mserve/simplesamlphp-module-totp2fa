@@ -116,14 +116,14 @@ class sspmod_totp2fa_OtpLogicHelper
         // further extensions
 
         // Check if attributes exist
-        if (!array_key_exists('Attributes', $request)) {
-            return false;
+        if (!array_key_exists('Attributes', $request)) {            
+            throw new Exception('missing Attributes field in request, cannot apply rule');
         }
       
         //// Check if we have required values
-        if (static::hasValidLogic($logic)) {
-            // TODO: throw error?
-            return false;
+        if (!static::hasValidLogic($logic)) {
+            // Throw error
+            throw new Exception('missing required setting, cannot apply rule');
         }
 
         //// Set internal values
@@ -140,8 +140,8 @@ class sspmod_totp2fa_OtpLogicHelper
                 // Ok, we wanted only to check for presence, hence return false as bool
                 return false;
             } else {
-                // TODO: throw error?
-                return false;
+                // throw error
+                throw new Exception('attribute ' . $attr . ' missing in request, cannot apply rule');
             }
         }
 

@@ -109,7 +109,7 @@ abstract class sspmod_totp2fa_Auth_Process_GenericOtpProcessor extends SimpleSAM
         
         // Check if 2FA has been already validated and still is valid
         if ($lastValidatedAt > 0) {
-            SimpleSAML\Logger::info("TOTP2FA Auth Proc Filter: last 2FA validation  at " . date("Y-M-d / h:i", $lastValidatedAt));
+            SimpleSAML\Logger::info("TOTP2FA Auth Proc Filter: last 2FA validation  at " . date("Y-M-d / H:i", $lastValidatedAt));
             if ($expiresAfter < 0) {                
                 SimpleSAML\Logger::info("TOTP2FA Auth Proc Filter: 2FA cannot be re-used, request new validation");
             } else if ($expiresAfter === 0) {
@@ -119,7 +119,7 @@ abstract class sspmod_totp2fa_Auth_Process_GenericOtpProcessor extends SimpleSAM
                 return;
             } elseif (time() < ($lastValidatedAt + $expiresAfter)) {
                 // still valid
-                SimpleSAML\Logger::info("TOTP2FA Auth Proc Filter: 2FA valid until " . date("Y-M-d / h:i", $lastValidatedAt + $this->expiresAfter) . ", re-use last validation");
+                SimpleSAML\Logger::info("TOTP2FA Auth Proc Filter: 2FA valid until " . date("Y-M-d / H:i", $lastValidatedAt + $this->expiresAfter) . ", re-use last validation");
                 // processing ends - return
                 return;
             } else {
