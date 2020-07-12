@@ -6,7 +6,8 @@
 
 use Wikimedia\IPSet;
 
-class sspmod_totp2fa_Auth_Process_CheckClientIp extends SimpleSAML_Auth_ProcessingFilter {
+class sspmod_totp2fa_Auth_Process_CheckClientIp extends SimpleSAML_Auth_ProcessingFilter
+{
 
 
 
@@ -30,8 +31,8 @@ class sspmod_totp2fa_Auth_Process_CheckClientIp extends SimpleSAML_Auth_Processi
 
         parent::__construct($config, $reserved);
         
-        // Set config value 
-        $this->config = $config;                
+        // Set config value
+        $this->config = $config;
     }
 
     /**
@@ -52,22 +53,25 @@ class sspmod_totp2fa_Auth_Process_CheckClientIp extends SimpleSAML_Auth_Processi
         }
         
         // Prepare settings
-        $settings = sspmod_totp2fa_OtpHelper::initializeSettingsArray();        
+        $settings = sspmod_totp2fa_OtpHelper::initializeSettingsArray();
 
         // Get ip
         $ip = @$_SERVER['HTTP_X_FORWARDED_FOR'] ?: @$_SERVER['REMOTE_ADDR'] ?: @$_SERVER['HTTP_CLIENT_IP'];
 
         // Check IPsets
+        //  $network    contains a CIDR description of a network
+        //  $netconfig  are settings to control the 2FA behavior as defined by TOTP2FA config for this specific network
+        //
+        // All networks are tested in the order as defined within the configuration
         foreach ($this->config['ipNetworks'] as $network => $netconfig) {
             $ipset = new IPSet(array($network));
             if ($ipset->match($ip) && sspmod_totp2fa_OtpHelper::hasValidSettings($netconfig)) {
                 SimpleSAML\Logger::info("TOTP2FA CheckClientIp Filter: IP ' . $ip . ' matches network " . $network);
                 $settings = sspmod_totp2fa_OtpHelper::updateSettings($netconfig, $settings);
             }
-        }        
+        }
 
         // Update settings
         sspmod_totp2fa_OtpHelper::updateRequestWithSettings($request, $settings);
     }
-
 }

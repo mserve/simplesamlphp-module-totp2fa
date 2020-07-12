@@ -4,7 +4,8 @@
 //use SimpleSAML\Logger;
 //use Webmozart\Assert\Assert;
 
-class sspmod_totp2fa_Auth_Process_CheckServiceProvider extends SimpleSAML_Auth_ProcessingFilter {
+class sspmod_totp2fa_Auth_Process_CheckServiceProvider extends SimpleSAML_Auth_ProcessingFilter
+{
 
 
 
@@ -28,8 +29,8 @@ class sspmod_totp2fa_Auth_Process_CheckServiceProvider extends SimpleSAML_Auth_P
 
         parent::__construct($config, $reserved);
         
-        // Set config value 
-        $this->config = $config;                
+        // Set config value
+        $this->config = $config;
     }
 
     /**
@@ -57,22 +58,24 @@ class sspmod_totp2fa_Auth_Process_CheckServiceProvider extends SimpleSAML_Auth_P
         }
 
         // Prepare settings
-        $settings = sspmod_totp2fa_OtpHelper::initializeSettingsArray();   
+        $settings = sspmod_totp2fa_OtpHelper::initializeSettingsArray();
 
         // Check match against entityid
         SimpleSAML\Logger::info("TOTP2FA CheckServiceProvider Filter: Checking SP '" . $request['SPMetadata']['entityid'] . "'");
         if (array_key_exists($request['SPMetadata']['entityid'], $this->config['serviceProviderSettings'])) {
+            // Okay, we have an entry matching this SP within our config array, get the config
             $spConfig = $this->config['serviceProviderSettings'][$request['SPMetadata']['entityid']];
             SimpleSAML\Logger::info("TOTP2FA CheckServiceProvider Filter: Service provider match for '" . $request['SPMetadata']['entityid'] . "' found");
+            // Check if config has valid TOTP2FA settings
             if (sspmod_totp2fa_OtpHelper::hasValidSettings($spConfig)) {
+                // update settings internally
                 $settings = sspmod_totp2fa_OtpHelper::updateSettings($spConfig, $settings);
             } else {
                 SimpleSAML\Logger::info("TOTP2FA CheckServiceProvider Filter: This SP has no valid settings, ignoring");
             }
         }
 
-        // Update settings
-        sspmod_totp2fa_OtpHelper::updateRequestWithSettings($request, $settings);       
+        // Update request with settings found by this filter
+        sspmod_totp2fa_OtpHelper::updateRequestWithSettings($request, $settings);
     }
-
 }
