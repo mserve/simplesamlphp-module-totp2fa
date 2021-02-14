@@ -8,9 +8,12 @@ use Webmozart\Assert\Assert;
 use OTPHP\Factory;
 */
 
+require(__DIR__ . "/../vendor/autoload.php");
+
+
 class sspmod_totp2fa_OtpHandler
 {
-    
+
     /**
      * config
      *
@@ -32,8 +35,8 @@ class sspmod_totp2fa_OtpHandler
     }
 
     /**
-     * validateToken validates a given token against an URI. Uses the 
-     * window setting of the config, if no 
+     * validateToken validates a given token against an URI. Uses the
+     * window setting of the config, if no window given
      *
      * @param  string $uri A TOTP URI
      * @param  string $token as entered by the user
@@ -47,20 +50,18 @@ class sspmod_totp2fa_OtpHandler
             // URI not valid
             return false;
         }
-        
+
         // Calculate window
         if ($this->config['window'] > 0) {
             $window = intval(ceil($this->config['window'] / $otp->getPeriod()));
         }
-        
-        return $otp->verify($token, null, $window);        
+        return $otp->verify($token, null, $window);
     }
 
 
-    
     /**
      * getExpectedToken
-     * 
+     *
      * returns the currently expected OTP token for a given URI.
      * This function should never be used on productive systems!
      *
@@ -74,15 +75,15 @@ class sspmod_totp2fa_OtpHandler
             // URI not valid
             return null;
         }
-        
-        // Get current value        
-        return $otp->now();        
+
+        // Get current value
+        return $otp->now();
     }
 
 
         /**
          * isProvisioningUriValid
-         * 
+         *
          * checks if the given $uri parameter matches TOTP syntax
          *
          * @param  string $uri
@@ -97,5 +98,5 @@ class sspmod_totp2fa_OtpHandler
             }
             return true;
         }
-        
+
 }

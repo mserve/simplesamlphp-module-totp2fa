@@ -2,17 +2,16 @@
     "name": "mserve/simplesamlphp-module-totp2fa",
     "description": "TOTP 2FA module, either using an attribute with totp:// url or an external API call",
     "type": "simplesamlphp-module",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "license": "LGPL-2.1-or-later",
     "authors": [
         {
-            "name": "Martin Schleyer",
-            "email": "schleyer@oszimt.de"
+            "name": "Martin Stuckenbroeker",
+            "email": "stuckenbroeker@oszimt.de"
         }
     ],
     "require": {
         "php": ">=7.0",
-        "simplesamlphp/composer-module-installer": "~1.0",
         "spomky-labs/otphp": "^8.3.3",
         "wikimedia/ip-set": "^2.1.0"
     }

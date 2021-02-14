@@ -4,6 +4,8 @@
 //use SimpleSAML\Logger;
 //use Webmozart\Assert\Assert;
 
+require(__DIR__ . "/../../../vendor/autoload.php");
+
 use Wikimedia\IPSet;
 
 class sspmod_totp2fa_Auth_Process_CheckClientIp extends SimpleSAML_Auth_ProcessingFilter

@@ -26,7 +26,7 @@ class sspmod_totp2fa_Auth_Process_CheckAttribute extends SimpleSAML_Auth_Process
         assert('array' === gettype($config));
 
         parent::__construct($config, $reserved);
-        
+
         // Set config value
         $this->config = $config;
     }
