@@ -2,7 +2,7 @@
 /**
  * This file will show an OTP form to ask the user for the current OTP token value
  *
- * @author Martin Schleyer <github@m-serve.de>
+ * @author Martin Stuckenbroeker <github@m-serve.de>
  *
  * @package TOTP2FA
  */
@@ -53,7 +53,7 @@ if (!empty($token)) {
         // Now valid handler - throw error
         SimpleSAML_Auth_State::throwException(
             $state,
-            new SimpleSAML_Error_Exception('Invalid OTP handler!'));    
+            new SimpleSAML_Error_Exception('Invalid OTP handler!'));
     }
 
     if ($isOtpValid) {
@@ -68,7 +68,7 @@ if (!empty($token)) {
         $template->data['errorcode'] = 400;
         $template->data['errtitle'] = "Invalid Token:";
         $template->data['errdesc'] = "The token you entered is invalid. Please check your token. If you use a software token, your local time might be to far off!";
-    }                
+    }
 } else if (empty($token) && !empty($_REQUEST['RequestSent'])) {
     $template->data['errorcode'] = 1;
     $template->data['errtitle'] = "No Token entered";
@@ -80,9 +80,9 @@ if (!empty($token)) {
 // get the name of the SP
 $spmd = $state['SPMetadata'];
 if (array_key_exists('name', $spmd)) {
-    $template->data['sp_name'] = $translator->getPreferredTranslation($spmd['name']);
+    $template->data['sp_name'] = $spmd['name']; //$translator->getPreferredTranslation($spmd['name']);
 } elseif (array_key_exists('OrganizationDisplayName', $spmd)) {
-    $template->data['sp_name'] = $translator->getPreferredTranslation($spmd['OrganizationDisplayName']);
+    $template->data['sp_name'] = $spmd['OrganizationDisplayName']; // $translator->getPreferredTranslation($spmd['OrganizationDisplayName']);
 } else {
     $template->data['sp_name'] = $spmd['entityid'];
 }
