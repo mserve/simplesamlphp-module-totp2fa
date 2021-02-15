@@ -161,11 +161,13 @@ abstract class sspmod_totp2fa_Auth_Process_GenericOtpProcessor extends SimpleSAM
         SimpleSAML\Utils\HTTP::redirectTrustedURL($url, array('AuthState' => $id));
     }
 
+    /*
     protected function openOtpFailedPage(array &$request): void {
         assert(is_array($request));
         $id = SimpleSAML_Auth_State::saveState($request, 'totp2fa:totp2fa:init');
         $url = SimpleSAML\Module::getModuleURL('totp2fa/otpinfo.php');
         SimpleSAML\Utils\HTTP::redirectTrustedURL($url, array('AuthState' => $id));
     }
+    */
 
 }

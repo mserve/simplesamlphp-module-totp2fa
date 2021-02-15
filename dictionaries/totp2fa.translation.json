@@ -1,26 +1,26 @@
 {
     "otp_header": {
-        "de": "Enter your One Time Password"
+        "de": "Bitte geben Sie Ihr Einmal-Passwort ein"
     },
     "error_header": {
-        "de": "An error occured!"
+        "de": "Ein Fehler ist aufgetreten!"
     },
     "otp_text": {
-        "de": "A service has requested you to authenticate yourself. Please enter your One Time Password to proceed."
+        "de": "Ein Dienst hat eine Zwei-Faktor-Authentifizierung angefordert. Bitte geben Sie ein Einmal-Passwort ein, um sich anzumelden."
     },
     "otp": {
-        "de": "Token"
+        "de": "Einmal-Passwort"
     },    
     "processing": {
-        "de": "Processing..."
+        "de": "Überprüfung..."
     },
     "continue_button": {
-        "de": "Continue"
+        "de": "Weiter"
     },
     "help_header": {
-        "de": "Help! I don't have my token available"        
+        "de": "Hilfe! Ich habe gerade kein Einmal-Passwort zur Hand"        
     },
     "help_text": {
-        "de": "Without your token you cannot authenticate yourself for access to the service. There may be someone that can help you. Consult the help desk at your organization!"
+        "de": "Ohne ein Einmal-Passwort können Sie sich nicht bei diesem Dienst anmelden. Fragen Sie beim Help Desk Ihrer Organisation, wenn Sie nicht wissen, wie Sie sich jetzt anmelden können!"
     }
 }

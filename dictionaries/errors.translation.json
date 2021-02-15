@@ -1,0 +1,27 @@
+{
+    "title_WRONG_TOKEN": {
+        "de": "Invalid Token"
+    }, 
+    "descr_WRONG_TOKEN": {
+        "de": "The token you entered is invalid. Please check your token. If you use a software token, your local time might be to far off!"
+    },
+    "title_MISSING_TOKEN": {
+        "de": "No Token entered."
+    }, 
+    "descr_MISSING_TOKEN": {
+        "de": "Please enter your One Time Password to proceed."    
+    },
+    "title_2FA_REQUIRED_BUT_INVALID": {
+        "de": "Setup required"
+    }, 
+    "descr_2FA_REQUIRED_BUT_INVALID": {
+        "de": "You did not properly set up your Two Factor Authentication. Please contact your Help Desk for further information."
+    },
+    "title_UNKNOWN_ERROR": {
+        "de": "An error occured"
+    }, 
+    "descr_UNKNOWN_ERROR": {
+        "de": "An unknown error occured. Please contact your Help Desk for further information."
+    }
+}
+

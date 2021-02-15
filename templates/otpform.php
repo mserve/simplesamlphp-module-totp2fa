@@ -11,10 +11,10 @@ if ($this->data['errorcode'] !== null) {
         <img src="/<?php echo $this->data['baseurlpath']; ?>resources/icons/experience/gtk-dialog-error.48x48.png"
              class="float-l erroricon" style="margin: 15px" alt=""/>
 
-        <h2><?php echo $this->t('{totp2fa:totp2fa:error_header}'); ?></h2>
+        <h2><?php echo $this->t('{totp2fa:errors:title_' . $this->data['errorcode'] . '}'); ?></h2>
 
         <p><strong><?php
-            echo $this->data['errdesc']; ?></strong></p>
+            echo $this->t('{totp2fa:errors:descr_' . $this->data['errorcode'] . '}') ?></strong></p>
         
     </div>
 <?php

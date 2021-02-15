@@ -80,8 +80,8 @@ class sspmod_totp2fa_Auth_Process_ProcessTotp extends sspmod_totp2fa_Auth_Proces
             if ($mode !== 'optional') {
                 // TODO: how to abort request?
                 $request['totp2fa:failed'] = true;
-                $request['totp2fa:failed_reason'] = 'blocked';
-                $this->openOtpFailedPage($request);
+                $request['totp2fa:failed:errorcode'] = '2FA_REQUIRED_BUT_INVALID';
+                $this->openOtpForm($request);
             }
         }
     }
