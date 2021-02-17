@@ -34,7 +34,7 @@ class sspmod_totp2fa_Auth_Process_ProcessTotp extends sspmod_totp2fa_Auth_Proces
         assert('array' === gettype($config));
 
         parent::__construct($config, $reserved);
-        
+ 
         // Set config value for attributeName
 		if (!empty($config["attributeName"])){
 			$this->attributeName = $config["attributeName"];
@@ -55,21 +55,37 @@ class sspmod_totp2fa_Auth_Process_ProcessTotp extends sspmod_totp2fa_Auth_Proces
     {
         // Assert::keyExists($request, 'Attributes');
         SimpleSAML\Logger::info("TOTP2FA ProcessTotp Auth Proc Filter: Entering process function");
-        
 
-        // Set 
+
+        // Set handler
         $this->setOtpHandler('ProcessTotp');
 
         // Read URN from attribute
-        $request['totp2fa:urn'] = $request['Attributes'][$this->attributeName][0];
-        // Remove attribute
-        unset($request['Attributes'][$this->attributeName]);
+        if (array_key_exists($this->attributeName, $request['Attributes'])) {
+            $request['totp2fa:urn'] = $request['Attributes'][$this->attributeName][0];
+            // Remove attribute
+            unset($request['Attributes'][$this->attributeName]);
+        } else {
+            $request['totp2fa:urn'] = "";
+	}
 
         // Call parent process method
         parent::process($request);
 
     }
-       
+
+    public function checkSetupOk(array &$request) {
+        /* OTP WITH INTERNAL VALIDATION PART */
+        // Check if properly provisioned
+        if (!sspmod_totp2fa_OtpHandler::isProvisioningUriValid($request['totp2fa:urn'])) {
+            // not provisioned is ok in 'optional' mode, fail otherwise
+            SimpleSAML\Logger::info("TOTP2FA ProcessTotp Auth Proc Filter: URI not valid");
+            return false;
+        }
+         return true;
+    }
+
+
 
     public function checkPrerequisites(array &$request, string $mode) {
         /* OTP WITH INTERNAL VALIDATION PART */

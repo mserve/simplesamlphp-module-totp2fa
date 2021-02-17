@@ -19,7 +19,7 @@ abstract class sspmod_totp2fa_Auth_Process_GenericOtpProcessor extends SimpleSAM
 
     /**
      * handler - can be 'ProcessTotp' or 'ProcessOtpViaApi'
-     * default: optional 
+     * default: ProcessTotp
      *
      * @var string
      */
@@ -105,7 +105,7 @@ abstract class sspmod_totp2fa_Auth_Process_GenericOtpProcessor extends SimpleSAM
         //  check if 2FA is still valid
         $session = SimpleSAML_Session::getSessionFromRequest();
         $lastValidatedAt = $session->getData('int', 'totp2fa:lastValidatedAt');  // Value > 0 - last time when 2FA was succesfull
-                       
+        
         
         // Check if 2FA has been already validated and still is valid
         if ($lastValidatedAt > 0) {
@@ -129,8 +129,17 @@ abstract class sspmod_totp2fa_Auth_Process_GenericOtpProcessor extends SimpleSAM
 
         
         /* OTP PART */
-        // If we arrive at this point, we have to request validation
-        // so, show token form
+        // If we arrive at this point, we could have to request validation
+        // so, show token form. Check if optional mode and setup correct
+
+        /* CHECK PREREQUISITES VALIDATION PART */
+        if (!$this->checkSetupOk($request))
+        {
+            SimpleSAML\Logger::info("TOTP2FA Auth Proc Filter: setup not completed, skip validation");
+            return;
+        }
+
+
         $this->openOtpForm($request);
 
 
@@ -148,6 +157,7 @@ abstract class sspmod_totp2fa_Auth_Process_GenericOtpProcessor extends SimpleSAM
     }
 
     abstract function checkPrerequisites(array &$request, string $mode);
+    abstract function checkSetupOk(array &$request);
 
     protected function openOtpForm(array &$request): void {
         assert(is_array($request));

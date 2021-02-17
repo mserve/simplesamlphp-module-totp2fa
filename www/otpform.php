@@ -38,17 +38,21 @@ $template->data['errorcode'] = null;
 $template->data['failed'] = false;
 
 // Check if prerequisites failed
-if (in_array('totp2fa:failed', $state) && $request['totp2fa:failed']) {
+if (array_key_exists('totp2fa:failed', $state) && $state['totp2fa:failed']) {
     \SimpleSAML\Logger::debug("totp2fa: Form called in error mode");
     $template->data['failed'] = true;
     if (in_array('totp2fa:failed:errorcode', $state)) {
-        $template->data['errorcode'] = $request['totp2fa:failed:errorcode'];        
+        $template->data['errorcode'] = $state['totp2fa:failed:errorcode'];
     } else {
         $template->data['errorcode'] = 'UNKNOWN_ERROR';
-    }    
+    }
 } else {
     // Check the token
-    $token = preg_replace("/\s+/", "", $_REQUEST['otp']);
+    if (array_key_exists('otp', $_REQUEST)) {
+        $token = preg_replace("/\s+/", "", $_REQUEST['otp']);
+    } else {
+        $token = '';
+    }
     $isOtpValid = false;
     if (!empty($token)) {
         // Validate the token, using a default window of 30 seconds (why?)
@@ -67,7 +71,7 @@ if (in_array('totp2fa:failed', $state) && $request['totp2fa:failed']) {
             SimpleSAML_Auth_State::throwException(
                 $state,
                 new SimpleSAML_Error_Exception('Invalid OTP handler!'));
-        }    
+        }
         if ($isOtpValid) {
             SimpleSAML_Auth_State::saveState($state, 'totp2fa:totp2fa:init');
             $session = SimpleSAML_Session::getSessionFromRequest();
@@ -78,14 +82,23 @@ if (in_array('totp2fa:failed', $state) && $request['totp2fa:failed']) {
             \SimpleSAML\Logger::debug("totp2fa: User entered wrong OTP");
             $template->data['errorcode'] = 'WRONG_TOKEN';
         } else {
+            // Mh, I shoudld not get into this case, should I?
+            // If mode is required, prerequisites are checked.
+            // Otherwise, there should not be a question for the token!
             \SimpleSAML\Logger::debug("totp2fa: URI is invalid");
+            $template->data['failed'] = true;
             $template->data['errorcode'] = 'URI_INVALID';
         }
     } else if (empty($token) && !empty($_REQUEST['RequestSent'])) {
         \SimpleSAML\Logger::debug("totp2fa: User did not enter an OTP");
         $template->data['errorcode'] = 'MISSING_TOKEN';
     }
+
+    // No token sent, no token expected, but form requested. Just show the form!
+    \SimpleSAML\Logger::debug("totp2fa: Validation required, show form");
+
 }
+
 // get the name of the SP
 $spmd = $state['SPMetadata'];
 if (array_key_exists('name', $spmd)) {
@@ -95,7 +108,5 @@ if (array_key_exists('name', $spmd)) {
 } else {
     $template->data['sp_name'] = $spmd['entityid'];
 }
-
-
 
 $template->show();
