@@ -94,11 +94,9 @@ class sspmod_totp2fa_Auth_Process_ProcessTotp extends sspmod_totp2fa_Auth_Proces
             // not provisioned is ok in 'optional' mode, fail otherwise
             SimpleSAML\Logger::info("TOTP2FA ProcessTotp Auth Proc Filter: URI not valid");
             if ($mode !== 'optional') {
-                // TODO: how to abort request?
-                $request['totp2fa:failed'] = true;
-                $request['totp2fa:failed:errorcode'] = '2FA_REQUIRED_BUT_INVALID';
-                $this->openOtpForm($request);
+                return false;
             }
         }
+        return true;
     }
 }

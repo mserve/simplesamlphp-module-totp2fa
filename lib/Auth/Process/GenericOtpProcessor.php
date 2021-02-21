@@ -48,7 +48,7 @@ abstract class sspmod_totp2fa_Auth_Process_GenericOtpProcessor extends SimpleSAM
         assert('array' === gettype($config));
 
         parent::__construct($config, $reserved);
-      
+
         // Set config value for mode
         if (!empty($config["mode"]) && sspmod_totp2fa_OtpHelper::hasValidMode($config)) {
             $this->mode = $config["mode"];
@@ -57,7 +57,7 @@ abstract class sspmod_totp2fa_Auth_Process_GenericOtpProcessor extends SimpleSAM
 
         // Set config value for expiresAfter
         if (!empty($config["expiresAfter"]) && sspmod_totp2fa_OtpHelper::hasValidExpiresAfter($config)) {
-                $this->expiresAfter = $config["expiresAfter"];            
+                $this->expiresAfter = $config["expiresAfter"];
         }
     }
 
@@ -68,9 +68,9 @@ abstract class sspmod_totp2fa_Auth_Process_GenericOtpProcessor extends SimpleSAM
      */
     public function process(&$request)
     {
-        // Assert::keyExists($request, 'Attributes');        
+        // Assert::keyExists($request, 'Attributes');
         SimpleSAML\Logger::info("TOTP2FA Auth Proc Filter: Entering process function");
-        
+
         // Start with default mode
         $mode = $this->mode;
         // Check if mode is set in request
@@ -80,7 +80,7 @@ abstract class sspmod_totp2fa_Auth_Process_GenericOtpProcessor extends SimpleSAM
                 $mode = $request['totp2fa:mode'];
             }
         }
-        
+
         // Check if expiresAfter is set in request
         $expiresAfter = $this->expiresAfter;
         if (!empty($request['totp2fa:expiresAfter'])) {
@@ -98,19 +98,22 @@ abstract class sspmod_totp2fa_Auth_Process_GenericOtpProcessor extends SimpleSAM
         }
 
         /* CHECK PREREQUISITES VALIDATION PART */
-        $this->checkPrerequisites($request, $mode);
-        
+        $preCheckOk = $this->checkPrerequisites($request, $mode);
+        if (!$preCheckOk) {
+                // Set request to failed
+		$this->setRequestFailed($request, '2FA_REQUIRED_BUT_INVALID');
+        }
 
         /* GENERIC PART */
         //  check if 2FA is still valid
         $session = SimpleSAML_Session::getSessionFromRequest();
         $lastValidatedAt = $session->getData('int', 'totp2fa:lastValidatedAt');  // Value > 0 - last time when 2FA was succesfull
-        
-        
+
+
         // Check if 2FA has been already validated and still is valid
         if ($lastValidatedAt > 0) {
             SimpleSAML\Logger::info("TOTP2FA Auth Proc Filter: last 2FA validation  at " . date("Y-M-d / H:i", $lastValidatedAt));
-            if ($expiresAfter < 0) {                
+            if ($expiresAfter < 0) {
                 SimpleSAML\Logger::info("TOTP2FA Auth Proc Filter: 2FA cannot be re-used, request new validation");
             } else if ($expiresAfter === 0) {
                 // 2FA does not expire
@@ -127,37 +130,44 @@ abstract class sspmod_totp2fa_Auth_Process_GenericOtpProcessor extends SimpleSAM
             }
         }
 
-        
+
         /* OTP PART */
         // If we arrive at this point, we could have to request validation
         // so, show token form. Check if optional mode and setup correct
+        // this assumes that passive login is not wanted in optional mode!
 
-        /* CHECK PREREQUISITES VALIDATION PART */
+        /* CHECK SETUP FOR OPTIONAL VALIDATION PART */
         if (!$this->checkSetupOk($request))
         {
-            SimpleSAML\Logger::info("TOTP2FA Auth Proc Filter: setup not completed, skip validation");
+            SimpleSAML\Logger::info("TOTP2FA Auth Proc Filter: setup not completed, but also not required, skip validation");
             return;
         }
 
-
+        // Open the form
         $this->openOtpForm($request);
 
 
     }
 
-    
+
     public function setOtpHandler(string $handler) {
         if (in_array($handler, array('ProcessTotp', 'ProcessOtpViaApi'))) {
             $this->handler = $handler;
         }
     }
-    
+
     public function getOtpHandler(): string {
-        return $this->handler;        
+        return $this->handler;
     }
 
     abstract function checkPrerequisites(array &$request, string $mode);
     abstract function checkSetupOk(array &$request);
+
+    protected function setRequestFailed(array &$request, string $reason) {
+                $request['totp2fa:failed'] = true;
+                $request['totp2fa:failed:errorcode'] = $reason;
+                $this->openOtpForm($request);
+    }
 
     protected function openOtpForm(array &$request): void {
         assert(is_array($request));
@@ -165,6 +175,11 @@ abstract class sspmod_totp2fa_Auth_Process_GenericOtpProcessor extends SimpleSAM
         $request['totp2fa:handler'] = $this->getOtpHandler();
         // Save state and get ID
         $id = SimpleSAML_Auth_State::saveState($request, 'totp2fa:totp2fa:init');
+	// Check passive mode
+        if (isset($request['isPassive']) && $request['isPassive'] === true) {
+            // Authentication in passive mode requestest, but we need to ask the user - deny form
+            throw new \SimpleSAML\Module\saml\Error\NoPassive("Passive authentication (OTP) not supported.");
+        }
         // Get URL
         $url = SimpleSAML\Module::getModuleURL('totp2fa/otpform.php');
         // Load URL with AuthState id
