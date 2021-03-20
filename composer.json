@@ -2,7 +2,7 @@
     "name": "mserve/simplesamlphp-module-totp2fa",
     "description": "TOTP 2FA module, either using an attribute with totp:// url or an external API call",
     "type": "simplesamlphp-module",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "license": "LGPL-2.1-or-later",
     "authors": [
         {
