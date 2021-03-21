@@ -8,4 +8,4 @@ if [ ! -x "bin/composer.phar" ]; then
 fi
 
 # Install dependencies (without vcs history or dev tools)
-php "bin/composer.phar" install --no-dev --prefer-dist -o -d
+php "bin/composer.phar" install --no-dev --prefer-dist -o
