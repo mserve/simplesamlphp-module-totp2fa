@@ -7,6 +7,11 @@
 # Sample configuration
 
 ```
+     69 => array(
+            'class' => 'totp2fa:UpdateSettings',
+            'settings' => [
+                'mode' => 'required',   // enforce required in further processing
+    ),
      70 => array(
             'class' => 'totp2fa:CheckServiceProvider',
             'serviceProviderSettings' => [
